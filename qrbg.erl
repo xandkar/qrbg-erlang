@@ -5,7 +5,8 @@
 %
 
 -export([connect/0, get_response/3, extract_data/1]).
--export([extract_int/1]).
+-export([extract_int/1, extract_unsigned_int/1, extract_short_int/1, extract_unsigned_short_int/1, extract_long_int/1, extract_unsigned_long_int/1]).
+-export([extract_byte/1, extract_char/1, extract_float/1, extract_unsigned_float/1, extract_double/1, extract_unsigned_double/1]).
 
 connect() ->
     gen_tcp:connect("random.irb.hr", 1227, [binary, {packet, 0}]).
@@ -24,12 +25,60 @@ extract_data(Bin) ->
     % io:format("Response: ~w Reason: ~w Length: ~w Data: ~w~n", [Response, Reason, Length, Data]),
     {ok, Response, Reason, Length, Data}.
 
+
 % Various data extraction bits
 
 extract_int(Bin) ->
-    Len = 8 * 4,
-    <<Int:Len/integer-signed, Rest/binary>> = Bin,
+    <<Int:32/integer-signed, Rest/binary>> = Bin,
     {Int, Rest}.
+
+extract_unsigned_int(Bin) ->
+    <<UnsignedInt:32/integer-unsigned, Rest/binary>> = Bin,
+    {UnsignedInt, Rest}.
+
+extract_short_int(Bin) ->
+    <<ShortInt:16/integer-signed, Rest/binary>> = Bin,
+    {ShortInt, Rest}.
+
+extract_unsigned_short_int(Bin) ->    
+    <<UnsignedShortInt:16/integer-unsigned, Rest/binary>> = Bin,
+    {UnsignedShortInt, Rest}.
+
+extract_long_int(Bin) ->
+    <<LongInt:64/integer-signed, Rest/binary>> = Bin,
+        {LongInt, Rest}.
+
+extract_unsigned_long_int(Bin) ->
+    <<UnsignedLongInt:64/integer-unsigned, Rest/binary>> = Bin,
+    {UnsignedLongInt, Rest}.
+
+extract_byte(Bin) ->
+    <<Byte:8/integer-unsigned, Rest/binary>> = Bin,
+    {Byte, Rest}.
+
+extract_char(Bin) ->
+    extract_byte(Bin).
+
+% TODO: Fix float/double functions
+
+extract_float(Bin) ->
+    % Python: data = 0x3F800000 | (self.getInt() & 0x00FFFFFF)
+    <<Float:32/float-signed, Rest/binary>> = Bin,
+    {Float, Rest}.
+
+extract_unsigned_float(Bin) ->
+    <<UnsignedFloat:32/float-unsigned, Rest/binary>> = Bin,
+    {UnsignedFloat, Rest}.
+
+extract_double(Bin) ->
+    % Python: data = 0x3FF0000000000000l | (self.getLong() & 0x000FFFFFFFFFFFFFl);
+    <<Double:64/float-signed, Rest/binary>> = Bin,
+    {Double, Rest}.
+
+extract_unsigned_double(Bin) ->
+    <<UnsignedDouble:64/float-unsigned, Rest/binary>> = Bin,
+    {UnsignedDouble, Rest}.
+
 
 %
 % crypto compatability API
