@@ -1,15 +1,23 @@
 -module(qrbg).
 
+% Include preset username/password
+-include_lib("qrbg.hrl").
+
 %
 % API
 %
 
--export([connect/0, get_response/3, extract_data/1]).
+-export([connect/0, get_response/1, get_response/3, extract_data/1]).
 -export([extract_int/1, extract_unsigned_int/1, extract_short_int/1, extract_unsigned_short_int/1, extract_long_int/1, extract_unsigned_long_int/1]).
 -export([extract_byte/1, extract_char/1, extract_float/1, extract_unsigned_float/1, extract_double/1, extract_unsigned_double/1]).
+-export([extract_int/2, extract_bytes/2]).
+-export([rand_bytes/1]).
 
 connect() ->
     gen_tcp:connect("random.irb.hr", 1227, [binary, {packet, 0}]).
+
+get_response(Socket) ->
+    get_response(Socket, ?USERNAME, ?PASSWORD).
 
 get_response(Socket, Username, Password) ->
     ContentLength = length(Username) + length(Password) + 6,
@@ -79,10 +87,26 @@ extract_unsigned_double(Bin) ->
     <<UnsignedDouble:64/float-unsigned, Rest/binary>> = Bin,
     {UnsignedDouble, Rest}.
 
+% Not included in Python/C libs
+
+extract_int(Bin, Length) ->
+    <<Int:Length/integer-signed, Rest/binary>> = Bin,
+    {Int, Rest}.
+
+extract_bytes(Bin, Length) ->
+    <<Bytes:Length/binary, Rest/binary>> = Bin,
+    {Bytes, Rest}.
 
 %
 % crypto compatability API
 %
+
+rand_bytes(Number) ->
+    {ok, Socket} = connect(),
+    Response = get_response(Socket),
+    {ok, _Response, _Reason, _Length, Data} = extract_data(Response),
+    {Bytes, _Rest} = extract_bytes(Data, Number),
+    Bytes.
 
 %
 % Internal
