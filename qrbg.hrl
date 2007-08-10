@@ -1,2 +1,3 @@
 -define(USERNAME, "username").
 -define(PASSWORD, "password").
+-define(REQUEST_SIZE, 4096).

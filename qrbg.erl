@@ -23,7 +23,7 @@ get_response(Socket, Username, Password) ->
     ContentLength = length(Username) + length(Password) + 6,
     UsernameLength = length(Username),
     PasswordLength = length(Password),
-    Data = list_to_binary([<<0:8,ContentLength:16,UsernameLength:8>>, Username, <<PasswordLength:8>>, Password, <<4096:32>>]),
+    Data = list_to_binary([<<0:8,ContentLength:16,UsernameLength:8>>, Username, <<PasswordLength:8>>, Password, <<?REQUEST_SIZE:32>>]),
     ok = gen_tcp:send(Socket, Data),
     % TODO: handle error conditions
     process_data(Socket, []).
