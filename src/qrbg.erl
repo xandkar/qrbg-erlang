@@ -57,8 +57,13 @@ get_response(Socket, RequestSize, Username, Password) ->
 
 
 extract_data(Bin) ->
-    <<Response:8, Reason:8, Length:32, Data:Length/binary, _Rest/binary>> = Bin,
-    % io:format("Response: ~w Reason: ~w Length: ~w Data: ~w~n", [Response, Reason, Length, Data]),
+    <<Response:8
+     ,Reason:8
+     ,Length:32
+     ,Data:Length/binary
+     ,_Rest/binary
+     >> = Bin,
+
     {ok, Response, Reason, Length, Data}.
 
 
