@@ -1,0 +1,12 @@
+{application, qrbg,
+ [
+  {description, ""},
+  {vsn, "dev"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { qrbg, []}},
+  {env, []}
+ ]}.
