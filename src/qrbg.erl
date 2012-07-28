@@ -118,29 +118,27 @@ extract_char(Bin) ->
 
 
 %%
-%% TODO: Fix float/double functions
+%% Floats in range 0-1
 %%
 
 extract_float(Bin) ->
-    % Python: data = 0x3F800000 | (self.getInt() & 0x00FFFFFF)
     <<Float:32/float-signed, Rest/binary>> = Bin,
-    {Float, Rest}.
+    {normalized(Float), Rest}.
 
 
 extract_unsigned_float(Bin) ->
     <<UnsignedFloat:32/float-unsigned, Rest/binary>> = Bin,
-    {UnsignedFloat, Rest}.
+    {normalized(UnsignedFloat), Rest}.
 
 
 extract_double(Bin) ->
-    % Python: data = 0x3FF0000000000000l | (self.getLong() & 0x000FFFFFFFFFFFFFl);
     <<Double:64/float-signed, Rest/binary>> = Bin,
-    {Double, Rest}.
+    {normalized(Double), Rest}.
 
 
 extract_unsigned_double(Bin) ->
     <<UnsignedDouble:64/float-unsigned, Rest/binary>> = Bin,
-    {UnsignedDouble, Rest}.
+    {normalized(UnsignedDouble), Rest}.
 
 
 %%
@@ -172,6 +170,13 @@ rand_bytes(Number, Username, Password) ->
 %% ============================================================================
 %% Internal
 %% ============================================================================
+
+%%
+%% Float in range 0-1
+%%
+normalized(Float) ->
+    abs(Float - trunc(Float)).
+
 
 process_data(Socket, SoFar) ->
     receive
