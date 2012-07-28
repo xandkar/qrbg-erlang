@@ -3,8 +3,8 @@
 
 %% API
 -export([connect/0
-        ,get_response/1
         ,get_response/3
+        ,get_response/4
         ,extract_data/1
         ,extract_int/1
         ,extract_unsigned_int/1
@@ -20,13 +20,11 @@
         ,extract_unsigned_double/1
         ,extract_int/2
         ,extract_bytes/2
-        ,rand_bytes/1
+        ,rand_bytes/3
         ]).
 
 
--define(USERNAME, "username").
--define(PASSWORD, "password").
--define(REQUEST_SIZE, 4096).
+-define(DEFAULT_REQUEST_SIZE, 4096).
 
 
 %% ============================================================================
@@ -37,11 +35,11 @@ connect() ->
     gen_tcp:connect("random.irb.hr", 1227, [binary, {packet, 0}]).
 
 
-get_response(Socket) ->
-    get_response(Socket, ?USERNAME, ?PASSWORD).
-
-
 get_response(Socket, Username, Password) ->
+    get_response(Socket, ?DEFAULT_REQUEST_SIZE, Username, Password).
+
+
+get_response(Socket, RequestSize, Username, Password) ->
     ContentLength = length(Username) + length(Password) + 6,
     UsernameLength = length(Username),
     PasswordLength = length(Password),
@@ -50,7 +48,7 @@ get_response(Socket, Username, Password) ->
         ,Username
         ,<<PasswordLength:8>>
         ,Password
-        ,<<?REQUEST_SIZE:32>>
+        ,<<RequestSize:32>>
         ]
     ),
     ok = gen_tcp:send(Socket, Data),
@@ -151,9 +149,9 @@ extract_bytes(Bin, Length) ->
 %% crypto compatability API
 %%
 
-rand_bytes(Number) ->
+rand_bytes(Number, Username, Password) ->
     {ok, Socket} = connect(),
-    Response = get_response(Socket),
+    Response = get_response(Socket, Username, Password),
     {ok, _Response, _Reason, _Length, Data} = extract_data(Response),
     {Bytes, _Rest} = extract_bytes(Data, Number),
     Bytes.
