@@ -1,17 +1,20 @@
 -module(qrbg).
 
-% Include preset username/password
--include_lib("qrbg.hrl").
 
 %
 % API
 %
-
 -export([connect/0, get_response/1, get_response/3, extract_data/1]).
 -export([extract_int/1, extract_unsigned_int/1, extract_short_int/1, extract_unsigned_short_int/1, extract_long_int/1, extract_unsigned_long_int/1]).
 -export([extract_byte/1, extract_char/1, extract_float/1, extract_unsigned_float/1, extract_double/1, extract_unsigned_double/1]).
 -export([extract_int/2, extract_bytes/2]).
 -export([rand_bytes/1]).
+
+
+-define(USERNAME, "username").
+-define(PASSWORD, "password").
+-define(REQUEST_SIZE, 4096).
+
 
 connect() ->
     gen_tcp:connect("random.irb.hr", 1227, [binary, {packet, 0}]).
