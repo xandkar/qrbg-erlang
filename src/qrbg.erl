@@ -3,6 +3,7 @@
 
 %% API
 -export([connect/0
+        ,connect/2
         ,get_response/3
         ,get_response/4
         ,extract_data/1
@@ -24,6 +25,8 @@
         ]).
 
 
+-define(DEFAULT_ADDRESS, "random.irb.hr").
+-define(DEFAULT_PORT, 1227).
 -define(DEFAULT_REQUEST_SIZE, 4096).
 
 
@@ -32,7 +35,11 @@
 %% ============================================================================
 
 connect() ->
-    gen_tcp:connect("random.irb.hr", 1227, [binary, {packet, 0}]).
+    connect(?DEFAULT_ADDRESS, ?DEFAULT_PORT).
+
+
+connect(Address, Port) ->
+    gen_tcp:connect(Address, Port, [binary, {packet, 0}]).
 
 
 get_response(Socket, Username, Password) ->
